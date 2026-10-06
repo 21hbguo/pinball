@@ -72,7 +72,7 @@ export function stepPhysics(dt, onSettle) {
     ball.parkT += dt;
     if (ball.parkT > 0.3) {
       S.parked = true; ball.vx = ball.vy = 0;
-      S.status = 'BALL BACK ON PLUNGER - HOLD START TO RELAUNCH';
+      S.status = '落回弹盘 · 按住【发射】重发';
     }
   } else ball.parkT = 0;
 

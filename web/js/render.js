@@ -98,7 +98,7 @@ function drawLane() {
   pg.addColorStop(0, '#8a94a0'); pg.addColorStop(0.5, '#e8eef4'); pg.addColorStop(1, '#6d7683');
   ctx.fillStyle = pg; ctx.fill();
 
-  label('LAUNCH', LANE_CX, 460, 20, '#b08d4f');
+  label('发射道', LANE_CX, 460, 20, '#b08d4f');
 }
 
 function drawWalls() {
@@ -132,13 +132,13 @@ function drawHud() {
   rr(90, 70, 900, 200, 26);
   ctx.fillStyle = '#33241A'; ctx.fill();
 
-  label('BALLS', 205, 105, 26, '#C9A96B');
+  label('弹珠', 205, 105, 26, '#C9A96B');
   led(String(S.wallet).padStart(3, '0'), 205, 160, 62);
 
-  label('WIN', 875, 105, 26, '#C9A96B');
+  label('派彩', 875, 105, 26, '#C9A96B');
   led(String(S.lastPayout).padStart(3, '0'), 875, 160, 62, S.lastWin ? '#FFD54A' : '#FF5040');
 
-  label('MULTIPLIER', 540, 92, 22, '#C9A96B');
+  label('倍率灯', 540, 92, 22, '#C9A96B');
   MULTS.forEach((m, i) => {
     const x = 372 + i * 84, y = 132;
     const lit = (S.phase === 'shuffle' && i === S.shuffleIdx) ||
@@ -260,24 +260,23 @@ function drawDeck() {
   ctx.fillStyle = '#7d5834'; ctx.fill();
 
   // top row: BET readout + effective multiplier
-  label('BET', 420, 1736, 26, '#FFe0a0');
+  label('投注', 420, 1736, 26, '#FFe0a0');
   led(String(S.wager).padStart(2, '0'), 515, 1736, 40);
-  if (S.mult) led(`${S.mult}X=${S.mult * S.wager}`, 680, 1738, 30, '#FFD54A');
-  else label('x MULT = PAYOUT', 680, 1738, 22, '#C9A96B');
+  if (S.mult) led(`${S.mult}X×${S.wager}=${S.mult * S.wager}`, 700, 1738, 30, '#FFD54A');
+  else label('倍率×注=派彩', 700, 1738, 24, '#C9A96B');
 
   // bottom row: buttons
   const startLit = S.phase !== 'resolve';
-  const startTxt = S.phase === 'over' ? 'AGAIN'
-    : S.phase === 'locked' ? 'GO!'
-    : (S.phase === 'ball' && S.parked) ? 'GO!' : 'START';
+  const startTxt = S.phase === 'over' ? '再来'
+    : (S.phase === 'locked' || (S.phase === 'ball' && S.parked)) ? '发射' : '开始';
   const charging = S.chargeOn;
-  drawBtn(BTN.start, charging ? '...' : startTxt, null,
+  drawBtn(BTN.start, charging ? '蓄力' : startTxt, null,
     charging ? '#FFD54A' : startLit ? '#7EC8FF' : '#4a6f8c',
     charging ? '#E8792E' : startLit ? '#1E6FB8' : '#33506b', '#EAF6FF');
-  drawBtn(BTN.betM, '-', null, '#FFC46B', '#E8792E');
-  drawBtn(BTN.betP, '+', null, '#FFC46B', '#E8792E');
-  drawBtn(BTN.insert, '+10', 'BALLS', '#9BE28A', '#3f9e4d');
-  drawBtn(BTN.reset, 'NEW', 'GAME', '#d3b08c', '#8a6d4d');
+  drawBtn(BTN.betM, '−', null, '#FFC46B', '#E8792E');
+  drawBtn(BTN.betP, '＋', null, '#FFC46B', '#E8792E');
+  drawBtn(BTN.insert, '+10', '弹珠', '#9BE28A', '#3f9e4d');
+  drawBtn(BTN.reset, '新局', null, '#d3b08c', '#8a6d4d');
 }
 
 function drawFloat() {
@@ -295,6 +294,6 @@ function drawFloat() {
 function drawOver() {
   ctx.fillStyle = 'rgba(30,18,8,.72)';
   rr(140, 640, 800, 300, 30); ctx.fill();
-  led('GAME OVER', 540, 760, 80);
-  label('START to restart with ' + START_CREDITS + ' balls', 540, 860, 34, '#FFE0A0');
+  led('游戏结束', 540, 760, 80);
+  label('按【开始】重新开局（' + START_CREDITS + ' 球）', 540, 860, 34, '#FFE0A0');
 }

@@ -41,14 +41,14 @@ export function pressStart() {
   sfx.click();
   if (S.phase === 'over') { newSession(); return; }
   if (S.phase === 'awaiting') {
-    if (S.wallet < 1) { S.phase = 'over'; setStatus('GAME OVER - START TO RESTART'); sfx.lose(); return; }
+    if (S.wallet < 1) { S.phase = 'over'; setStatus('游戏结束 · 按【开始】重开'); sfx.lose(); return; }
     S.phase = 'shuffle'; S.shuffleT = 0;
-    setStatus('SHUFFLING... START TO LOCK');
+    setStatus('灯光游动中… 按【开始】锁定');
   } else if (S.phase === 'shuffle') {
     S.mult = weightedMult();
     S.active = pickActive(S.mult);
     S.phase = 'locked'; S.flashT = 1.0;
-    setStatus(`${S.mult}X LOCKED - SET BET, HOLD GO TO FIRE`);
+    setStatus(`${S.mult}X 锁定 · 设投注 · 按住【发射】蓄力`);
     sfx.lock();
   }
 }
@@ -68,7 +68,7 @@ export function releaseCharge() {
   const held = performance.now() - S.chargeStamp;
   const power = held < 140 ? TAP_POWER : Math.min(1, S.chargeT / (CHARGE_FULL_MS / 1000));
   if (S.phase === 'locked') {
-    if (S.wager > S.wallet) { setStatus('BET TOO BIG - LOWER BET OR INSERT'); return; }
+    if (S.wager > S.wallet) { setStatus('余额不足 · 减注或按【+10】加球'); return; }
     S.wallet -= S.wager; saveWallet();
     S.phase = 'ball';
     S.lastChannel = null; S.lastPayout = 0; S.lastWin = false; S.winFx = null;
@@ -84,7 +84,7 @@ export function fire(power) {
   ball.vx = 0;
   ball.vy = -(LAUNCH_MIN + LAUNCH_SPAN * power);
   ball.settleT = 0; ball.parkT = 0; ball.stuckT = 0;
-  setStatus('BALL IN PLAY...');
+  setStatus('弹珠滚动中…');
   sfx.launch(power);
 }
 
@@ -104,19 +104,19 @@ export function resolveBall() {
   }
   saveWallet();
   S.phase = 'resolve'; S.resolveT = 1.4;
-  setStatus(S.lastWin ? `CH${ch} ACTIVE - WIN ${S.lastPayout}` : `CH${ch} - NO WIN`);
+  setStatus(S.lastWin ? `${ch} 号道命中 +${S.lastPayout}` : `${ch} 号道未中`);
 }
 
 function endResolve() {
-  if (S.wallet < 1) { S.phase = 'over'; setStatus('GAME OVER - START TO RESTART'); }
-  else { S.phase = 'awaiting'; setStatus('PRESS START'); parkBall(); }
+  if (S.wallet < 1) { S.phase = 'over'; setStatus('游戏结束 · 按【开始】重开'); }
+  else { S.phase = 'awaiting'; setStatus('按【开始】'); parkBall(); }
 }
 
 export function newSession() {
   S.wallet = START_CREDITS; S.wager = 1;
   S.mult = null; S.active = new Set();
   S.lastChannel = null; S.lastPayout = 0; S.lastWin = false;
-  S.phase = 'awaiting'; setStatus('PRESS START');
+  S.phase = 'awaiting'; setStatus('按【开始】');
   S.chargeOn = false;
   parkBall();
   saveWallet();
@@ -124,7 +124,7 @@ export function newSession() {
 
 export function addCredit(n) {
   S.wallet += n; saveWallet(); sfx.click();
-  if (S.phase === 'over') { S.phase = 'awaiting'; setStatus('PRESS START'); }
+  if (S.phase === 'over') { S.phase = 'awaiting'; setStatus('按【开始】'); }
 }
 
 export function changeBet(d) {

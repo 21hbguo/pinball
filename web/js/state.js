@@ -12,7 +12,7 @@ export const S = {
   lastChannel: null,
   lastPayout: 0,
   lastWin: false,
-  status: 'PRESS START',
+  status: '按【开始】',
   shuffleT: 0, shuffleIdx: 0, chaseIdx: 0,
   flashT: 0,
   resolveT: 0,
