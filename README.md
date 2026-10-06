@@ -1,23 +1,34 @@
 # Pinball
 
-A simple pinball (弹珠) game project.
+TapTap mini-game recreation of the supplied physical single-ball marble machine.
 
-## Overview
+## Confirmed gameplay direction
 
-This repository contains a pinball game — launch the ball, keep it in play with
-flippers, and score points by hitting bumpers and targets.
+- one physical ball per round;
+- wager can consume multiple ball-credits, but never creates multiple physical balls;
+- START randomizes/locks a base multiplier and active terminal channels;
+- multiplier options: 2X / 4X / 6X / 8X / 10X;
+- 12 physical terminal channels;
+- active-channel hit pays `wager × base multiplier`;
+- inactive-channel hit pays 0;
+- higher multipliers correspond to fewer active channels;
+- rotating 3D cabinet opening → 2D physical playfield.
 
-## Getting Started
+Example: wager 5 at 4X still launches one physical ball. If that ball hits an active channel, payout is 20 ball-credits.
 
-Clone the repository:
+## Repository
 
-```bash
-git clone https://github.com/21hbguo/pinball.git
-cd pinball
+```
+art/mvp/                     art source from PR #1
+assets/scripts/config/       table/rule configuration
+assets/scripts/core/         engine-independent round + settlement rules
+assets/scripts/gameplay/     Cocos 2D physics
+assets/scripts/lobby/        3D opening transition
+assets/scripts/ui/           wallet / wager / multiplier / payout HUD
+assets/scripts/platform/     TapTap boundary
+docs/                        design, architecture, art binding, tests
 ```
 
-Further setup instructions will be added as the project develops.
+Target engine: Cocos Creator 3.8.x.
 
-## License
-
-TBD
+The original source-machine image is not stored in the repo, so exact 12-channel geometry and some randomization parameters remain provisional until the image is re-measured.
