@@ -2,7 +2,8 @@ import type { TableDefinition } from '../config/TableDefinition';
 
 export type SessionPhase =
   | 'idle'
-  | 'round-ready'
+  | 'awaiting-start'
+  | 'round-locked'
   | 'ball-active'
   | 'round-resolving';
 
@@ -78,7 +79,7 @@ export class GameSession {
   }
 
   startSession(initialBallCredits: number): SessionSnapshot {
-    this.phase = 'round-ready';
+    this.phase = 'awaiting-start';
     this.walletBalls = Math.max(0, Math.floor(initialBallCredits));
     this.wager = 1;
     this.baseMultiplier = null;
@@ -129,7 +130,7 @@ export class GameSession {
     this.lastChannel = null;
     this.lastWin = false;
     this.lastPayout = 0;
-    this.phase = 'round-ready';
+    this.phase = 'round-locked';
 
     const snapshot = this.getSnapshot();
     this.emit({ type: 'round-configured', snapshot });
@@ -138,7 +139,7 @@ export class GameSession {
 
   canLaunch(): boolean {
     return (
-      this.phase === 'round-ready' &&
+      this.phase === 'round-locked' &&
       this.baseMultiplier !== null &&
       this.activeChannels.length > 0 &&
       this.walletBalls >= this.wager
@@ -191,7 +192,7 @@ export class GameSession {
 
     this.walletBalls += this.lastPayout;
     this.roundsPlayed += 1;
-    this.phase = 'round-ready';
+    this.phase = 'awaiting-start';
 
     const snapshot = this.getSnapshot();
     this.emit({ type: 'round-settled', snapshot });
@@ -208,7 +209,7 @@ export class GameSession {
     this.lastWin = false;
     this.lastPayout = 0;
     this.roundsPlayed += 1;
-    this.phase = 'round-ready';
+    this.phase = 'awaiting-start';
 
     const snapshot = this.getSnapshot();
     this.emit({ type: 'round-settled', snapshot });
