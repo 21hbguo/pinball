@@ -16,11 +16,11 @@ export type PegDef = Readonly<{
 
 export type RectSensorDef = Readonly<{
   id: string;
+  channel: number;
   x: number;
   y: number;
   width: number;
   height: number;
-  score: number;
 }>;
 
 export type RectWallDef = Readonly<{
@@ -39,15 +39,32 @@ export type CircleObstacleDef = Readonly<{
   radius: number;
   friction: number;
   restitution: number;
-  score: number;
+}>;
+
+export type ActiveChannelCountRange = Readonly<{
+  min: number;
+  max: number;
 }>;
 
 export type TableDefinition = Readonly<{
   id: string;
   designWidth: number;
   designHeight: number;
-  ballsPerRun: number;
-  scoreDigits: number;
+
+  /** Credit stake options. They never change physical ball count. */
+  wagerOptions: readonly number[];
+  multiplierOptions: readonly number[];
+
+  /** The physical table has 12 terminal channels. */
+  channelCount: number;
+
+  /**
+   * Only put source-confirmed values here. Missing multipliers stay undefined
+   * until the real machine's rule table is verified.
+   */
+  activeChannelCountByMultiplier: Readonly<
+    Partial<Record<number, ActiveChannelCountRange>>
+  >;
 
   ballSpawn: Vec2Def;
   ball: CircleMaterialDef & Readonly<{
@@ -75,7 +92,7 @@ export type TableDefinition = Readonly<{
   pegs: readonly PegDef[];
   centerObstacles: readonly CircleObstacleDef[];
   guideWalls: readonly RectWallDef[];
-  slots: readonly RectSensorDef[];
+  channels: readonly RectSensorDef[];
 
   stuckRecovery: Readonly<{
     minSpeed: number;
