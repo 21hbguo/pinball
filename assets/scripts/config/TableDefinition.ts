@@ -51,8 +51,7 @@ export type TableDefinition = Readonly<{
   designWidth: number;
   designHeight: number;
 
-  /** Credit stake options. They never change physical ball count. */
-  wagerOptions: readonly number[];
+  /** Wager is a positive integer credit amount; it never changes physical ball count. */
   multiplierOptions: readonly number[];
 
   /** The physical table has 12 terminal channels. */
