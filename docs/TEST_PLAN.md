@@ -1,92 +1,58 @@
 # Test Plan
 
-## A. Rule tests
+## Rule tests
 
-### Session
-- New run starts with 5 balls.
-- START consumes exactly one ball.
-- START cannot create a second active ball.
-- Slot 2/4/6/8/10 adds exactly that value.
-- Drain adds 0.
-- A terminal event cannot resolve the same ball twice.
-- After the fifth resolved ball, phase becomes GAME_OVER.
-- RESTART clears score and restores 5 balls.
+- A round always spawns exactly one physical ball.
+- Wager 1, 3, 5, 10, or any other supported positive integer never changes physical ball count.
+- Wager is deducted once, before launch.
+- Example: wager 5 + base multiplier 4X + active-channel hit => payout 20.
+- Same example + inactive-channel hit => payout 0.
+- One ball can settle only once.
+- After settlement, a new START/randomization is required before another launch.
+- Active channels must be valid channel numbers 1-12.
+- Base multiplier must be one of 2 / 4 / 6 / 8 / 10.
 
-## B. Geometry tests
+## Random-selection tests
 
-Use the 1080×1920 reference overlay.
+Known rule constraints:
+- 2X can activate roughly 4-5 channels.
+- 10X can activate roughly 1 channel.
 
-- 17 peg centers match the table spec.
-- Peg radius matches the visual circle.
-- Central obstacle center/radius align with artwork.
-- Five slot sensor rectangles stay inside their visual slots.
-- Slot divider colliders do not overlap the sensor centers.
-- Left/right wall colliders keep the ball inside the physical playfield.
-- Ball spawn does not overlap a peg.
+Do not finalize 4X / 6X / 8X channel counts or multiplier probabilities until they are verified from the machine/reference.
 
-## C. Physics tests
+## Geometry tests
 
-Run at least 100 drops after each material-tuning change.
+- 12 terminal channels cover the intended bottom playfield.
+- Channel sensor rectangles do not overlap adjacent channel centers.
+- Divider colliders correctly funnel the one ball into one terminal channel.
+- Peg/central geometry matches the source image once re-measured.
+- Ball spawn does not overlap fixed geometry.
 
-Record:
-- terminal slot distribution;
-- drain rate;
-- average ball duration;
-- stuck-ball recovery count;
-- maximum speed;
-- any tunnelling through pegs/walls.
+## Physics tests
 
-Acceptance baseline:
-- no duplicate score;
-- no ball survives indefinitely;
-- no obvious tunnelling at normal speed;
-- stuck recovery is rare rather than part of normal play;
-- all five slots are physically reachable.
+Run repeated one-ball drops:
+- no tunnelling;
+- no duplicate terminal events;
+- no persistent stuck ball;
+- every physically reachable channel reports the correct index;
+- wager size has zero effect on trajectory.
 
-Do not tune the game to equal slot probabilities unless the real machine implies that. Geometry fidelity has priority.
+## UI tests
 
-## D. Interaction tests
+- First START starts light/random-selection state.
+- Second START locks multiplier and active channels.
+- BET changes wager only.
+- LAUNCH releases exactly one physical ball.
+- wallet decrements by wager once;
+- WIN updates by payout once;
+- active-channel lights visually match the locked round.
 
-- START works only in READY.
-- START disabled while a ball is active.
-- Score updates after the terminal slot event.
-- Remaining-ball count is visually correct.
-- RESTART works from GAME_OVER.
-- Touching the 3D cabinet once triggers one transition only.
+## TapTap device tests
 
-## E. Visual/source comparison
-
-Side-by-side checks:
-- cabinet aspect ratio;
-- HUD location;
-- peg row count and staggering;
-- central object position;
-- numeric slot order;
-- slot widths/gaps;
-- START button position;
-- ball scale relative to peg scale.
-
-The target is close source-machine resemblance, not generic pinball aesthetics.
-
-## F. TapTap device testing
-
-After Cocos build conversion:
-- Android TapTap QR debug;
-- iOS TapTap debug if available;
+- Android QR debug;
+- iOS debug if available;
 - low/mid/high device FPS;
-- touch latency;
-- app resume/pause during an active ball;
-- repeated scene transition;
-- local score storage fallback;
-- package size and startup time.
-
-## G. Regression checklist
-
-Any table-layout change must re-run:
-- 20 manual balls;
-- one complete five-ball run;
-- each terminal slot forced once;
-- one drain;
-- one stuck-ball recovery;
-- one restart;
-- 3D → 2D transition three times.
+- pause/resume during an active ball;
+- repeated 3D → 2D transition;
+- local wallet persistence;
+- startup/package-size checks.
