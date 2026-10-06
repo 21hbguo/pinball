@@ -1,107 +1,91 @@
 # Architecture
 
-## Principles
+## Core model
 
-1. The source/reference table is data, not code.
-2. Physics and session rules are independent.
-3. Only one active ball exists at a time on the first table.
-4. Platform APIs are isolated behind `TapAdapter`.
-5. Visual assets can change without changing rules or physics geometry.
+The first table is a **one-physical-ball-per-round** machine.
 
-## Runtime layers
+A round contains:
+- wager N (ball-credit stake);
+- base multiplier (2 / 4 / 6 / 8 / 10);
+- active channel set among 12 terminal channels;
+- exactly one physical ball;
+- one terminal result;
+- one payout.
 
-### 1. Table configuration
+There is never a need to create N physical balls when the player wagers N credits.
+
+## Layers
+
+### Table configuration
 `assets/scripts/config/`
 
-- `TableDefinition.ts`: schema.
-- `ClassicSingleBallTable.ts`: first table coordinates, scores and physics tuning.
+`ClassicSingleBallTable.ts` owns:
+- 1080×1920 table coordinate system;
+- multiplier options;
+- 12 terminal channels;
+- known active-channel-count rules;
+- peg geometry;
+- channel/divider geometry;
+- ball and collision parameters.
 
-This is the main file to edit when matching the original machine image.
+Unverified source rules remain absent/configurable rather than guessed.
 
-### 2. Pure game core
-`assets/scripts/core/`
+### Pure rule core
+`assets/scripts/core/GameSession.ts`
 
-- `GameSession.ts`: READY → BALL_ACTIVE → RESOLVE → READY/GAME_OVER.
-- `DesignSpace.ts`: converts the 1080×1920 reference coordinate system to Cocos centered Y-up coordinates.
-- `ScoreFormat.ts`: HUD formatting.
+State flow:
+- `awaiting-start`
+- `round-locked`
+- `ball-active`
+- `round-resolving`
+- back to `awaiting-start`
 
-The core does not import Cocos.
+Settlement:
+- wager is deducted before launch;
+- one ball is launched;
+- active-channel hit → payout = wager × baseMultiplier;
+- inactive channel / miss → payout = 0.
 
-### 3. Physics runtime
-`assets/scripts/gameplay/`
+### Physics runtime
+`assets/scripts/gameplay/ReferenceTableRuntime.ts`
 
-- `ReferenceTableRuntime.ts`: builds pegs, walls, sensors and the current ball.
-- `BallLifecycle.ts`: speed limiting and stuck-ball detection.
+Creates:
+- one dynamic ball when a locked round launches;
+- static pegs and walls;
+- 12 terminal channel sensors.
 
-The runtime consumes the table configuration and forwards terminal outcomes to `GameSession`.
+Physics has no knowledge of stake size beyond the session result.
 
-### 4. UI
-`assets/scripts/ui/`
+### UI
+`assets/scripts/ui/GameHUD.ts`
 
-- `GameHUD.ts`: BALLS, SCORE, result text and START/RESTART state.
+Shows:
+- wallet;
+- wager;
+- base/effective multiplier;
+- payout;
+- launch availability.
 
-### 5. Lobby
-`assets/scripts/lobby/`
+START-light randomization is intentionally a separate controller because exact 4X/6X/8X channel-count and probability rules still need source verification.
 
-- `OpeningMachineController.ts`: slow 3D cabinet rotation and transition into `Pinball2D`.
+### Lobby
+`OpeningMachineController.ts`
 
-### 6. Platform
-`assets/scripts/platform/`
+Rotating 3D cabinet → tap → 2D machine view.
 
-- `TapAdapter.ts`: the only place allowed to access the TapTap mini-game global runtime.
+### Platform
+`TapAdapter.ts`
 
-## Scene plan
-
-### Lobby3D
-- Camera
-- CabinetRoot
-  - imported `art/mvp/3d/machine/pinball_machine.obj`
-- OpeningInput
-  - `OpeningMachineController`
-
-### Pinball2D
-- Canvas (design resolution 1080×1920)
-- PlayfieldVisual
-  - background
-  - peg sprites
-  - center art
-  - slot sprites / number labels
-- PhysicsRoot
-  - `ReferenceTableRuntime`
-- HUD
-  - BALLS label
-  - SCORE label
-  - result label
-  - START button
-  - `GameHUD`
-
-Physics visuals currently have a simple geometry fallback so collision layout remains inspectable before final sprite binding. Production presentation should place the art sprites on `PlayfieldVisual` while `PhysicsRoot` remains invisible.
-
-## Art source of truth
-
-Use assets from PR #1 / `art/mvp/`:
-- `2d/objects/ball.svg`
-- `2d/playfield/peg.svg`
-- `2d/playfield/slot.svg`
-- `2d/playfield/slot_active.svg`
-- `2d/playfield/background.svg`
-- `2d/ui/hud_panel.svg`
-- `2d/ui/button_start*.svg`
-- `2d/vfx/hit_flash.svg`
-- `3d/machine/pinball_machine.obj`
-
-Do not redraw these in gameplay code. The Graphics shapes in `ReferenceTableRuntime` are fallback/debug visuals only.
+TapTap-specific APIs remain isolated from game rules.
 
 ## Source-fidelity workflow
 
-When the original physical-machine reference image is available:
-1. overlay it at 1080×1920;
-2. measure every peg center/radius;
-3. update `ClassicSingleBallTable.ts`;
-4. measure slot/divider geometry;
-5. update the same config;
-6. run repeated drop tests;
-7. adjust restitution/friction only after geometry matches;
-8. keep score rules exactly as shown by the source.
-
-No gameplay system rewrite should be needed.
+When the original machine image is available:
+1. measure peg coordinates/radii;
+2. measure all 12 channel boundaries;
+3. measure multiplier-light/UI positions;
+4. update table configuration;
+5. verify exact active-channel counts per multiplier;
+6. verify randomization probabilities;
+7. run physical drop tests;
+8. tune material parameters only after geometry matches.
