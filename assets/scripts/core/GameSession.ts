@@ -107,8 +107,8 @@ export class GameSession {
       throw new Error(`Unsupported multiplier: ${setup.baseMultiplier}`);
     }
 
-    if (!this.table.wagerOptions.includes(setup.wager)) {
-      throw new Error(`Unsupported wager: ${setup.wager}`);
+    if (!Number.isInteger(setup.wager) || setup.wager < 1) {
+      throw new Error(`Wager must be a positive integer: ${setup.wager}`);
     }
 
     const active = [...new Set(setup.activeChannels)].sort((a, b) => a - b);
