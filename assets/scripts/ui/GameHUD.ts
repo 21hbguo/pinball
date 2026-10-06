@@ -1,7 +1,7 @@
-import { _decorator, Button, Component, Label, Node } from 'cc';
+import { _decorator, Button, Component, Label } from 'cc';
 
 import type { SessionEvent, SessionSnapshot } from '../core/GameSession';
-import { formatBalls, formatScore } from '../core/ScoreFormat';
+import { formatBalls } from '../core/ScoreFormat';
 import { ReferenceTableRuntime } from '../gameplay/ReferenceTableRuntime';
 
 const { ccclass, property } = _decorator;
@@ -12,19 +12,19 @@ export class GameHUD extends Component {
   tableRuntime: ReferenceTableRuntime | null = null;
 
   @property(Label)
-  ballsLabel: Label | null = null;
+  balanceLabel: Label | null = null;
 
   @property(Label)
-  scoreLabel: Label | null = null;
+  wagerLabel: Label | null = null;
 
   @property(Label)
-  resultLabel: Label | null = null;
+  multiplierLabel: Label | null = null;
+
+  @property(Label)
+  payoutLabel: Label | null = null;
 
   @property(Button)
-  startButton: Button | null = null;
-
-  @property(Label)
-  startButtonLabel: Label | null = null;
+  launchButton: Button | null = null;
 
   private readonly onSessionEvent = (event: SessionEvent): void => {
     this.render(event.snapshot);
@@ -50,50 +50,41 @@ export class GameHUD extends Component {
     );
   }
 
-  public onStartPressed(): void {
-    if (!this.tableRuntime) {
-      return;
-    }
-
-    const snapshot = this.tableRuntime.getSnapshot();
-    if (snapshot.phase === 'game-over') {
-      this.tableRuntime.restartSession();
-      this.tableRuntime.startNextBall();
-      return;
-    }
-
-    this.tableRuntime.startNextBall();
+  /** Launches exactly one physical ball after START/randomization is locked. */
+  public onLaunchPressed(): void {
+    this.tableRuntime?.launchCurrentRound();
   }
 
   private render(snapshot: SessionSnapshot): void {
-    if (this.ballsLabel) {
-      this.ballsLabel.string = formatBalls(snapshot.ballsRemaining);
+    if (this.balanceLabel) {
+      this.balanceLabel.string = formatBalls(snapshot.walletBalls);
     }
 
-    if (this.scoreLabel) {
-      this.scoreLabel.string = formatScore(snapshot.score, 5);
+    if (this.wagerLabel) {
+      this.wagerLabel.string = `BET ${snapshot.wager}`;
     }
 
-    if (this.resultLabel) {
-      if (snapshot.phase === 'game-over') {
-        this.resultLabel.string = `FINAL  ${formatScore(snapshot.score, 5)}`;
-        this.resultLabel.node.active = true;
-      } else if (snapshot.lastSlotId && snapshot.lastAward > 0) {
-        this.resultLabel.string = `+${snapshot.lastAward}`;
-        this.resultLabel.node.active = true;
+    if (this.multiplierLabel) {
+      this.multiplierLabel.string =
+        snapshot.baseMultiplier === null
+          ? '--'
+          : `${snapshot.baseMultiplier}X × ${snapshot.wager} = ${snapshot.effectiveMultiplier}X`;
+    }
+
+    if (this.payoutLabel) {
+      if (snapshot.lastPayout > 0) {
+        this.payoutLabel.string = `WIN +${snapshot.lastPayout}`;
+        this.payoutLabel.node.active = true;
+      } else if (snapshot.lastChannel !== null) {
+        this.payoutLabel.string = 'NO WIN';
+        this.payoutLabel.node.active = true;
       } else {
-        this.resultLabel.node.active = false;
+        this.payoutLabel.node.active = false;
       }
     }
 
-    if (this.startButton) {
-      this.startButton.interactable =
-        snapshot.phase === 'ready' || snapshot.phase === 'game-over';
-    }
-
-    if (this.startButtonLabel) {
-      this.startButtonLabel.string =
-        snapshot.phase === 'game-over' ? 'RESTART' : 'START';
+    if (this.launchButton) {
+      this.launchButton.interactable = snapshot.phase === 'round-locked';
     }
   }
 }
