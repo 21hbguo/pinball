@@ -8,20 +8,39 @@ const peg = (id: string, x: number, y: number) => ({
   restitution: 0.82,
 } as const);
 
+const CHANNEL_LEFT = 84;
+const CHANNEL_TOP = 1460;
+const CHANNEL_HEIGHT = 194;
+const CHANNEL_WIDTH = 76;
+
 /**
- * Reference-faithful baseline built from art/mvp/preview/mvp_board.svg.
- * Coordinates stay in 1080x1920 top-left design space.
+ * Reference-faithful baseline.
  *
- * Important: when the original reference image is available in the active
- * conversation, update this file rather than changing gameplay systems.
+ * Confirmed gameplay facts:
+ * - one physical ball per round;
+ * - multiplier choices are 2 / 4 / 6 / 8 / 10;
+ * - the physical result is one of 12 terminal channels;
+ * - wagering N ball-credits multiplies the round payout, but still launches
+ *   only one physical ball;
+ * - at 2X, roughly 4-5 channels may be active;
+ * - at 10X, roughly 1 channel may be active.
+ *
+ * Exact channel geometry and the 4X/6X/8X activation counts still need to be
+ * re-measured from the original machine image. Current 12-channel geometry is
+ * a provisional equal-width layout so the runtime matches the confirmed rule
+ * structure without inventing unverified probability rules.
  */
 export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
-  id: 'classic-single-ball-v1',
+  id: 'classic-single-ball-v2',
   designWidth: 1080,
   designHeight: 1920,
 
-  ballsPerRun: 5,
-  scoreDigits: 5,
+  multiplierOptions: [2, 4, 6, 8, 10],
+  channelCount: 12,
+  activeChannelCountByMultiplier: {
+    2: { min: 4, max: 5 },
+    10: { min: 1, max: 1 },
+  },
 
   ballSpawn: { x: 520, y: 350 },
   ball: {
@@ -31,15 +50,12 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
     restitution: 0.72,
     linearDamping: 0.06,
     angularDamping: 0.04,
-    // RigidBody2D velocity unit (m/s).
     maxSpeed: 18,
   },
 
-  // Box2D-style physical acceleration in m/s^2; +Y means downward in table space.
   gravity: { x: 0, y: 14 },
   fixedTimeStep: 1 / 60,
 
-  // The reference machine behaves primarily as a gravity drop.
   release: {
     initialVelocity: { x: 0, y: 0.4 },
     horizontalJitter: 0.12,
@@ -60,8 +76,6 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
     peg('p15', 300, 990), peg('p16', 540, 990), peg('p17', 780, 990),
   ],
 
-  // The current preview contains a large central element. Keep it as a
-  // non-scoring obstacle until the source rule can be verified.
   centerObstacles: [
     {
       id: 'center',
@@ -69,27 +83,27 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
       radius: 88,
       friction: 0.08,
       restitution: 0.66,
-      score: 0,
     },
   ],
 
-  guideWalls: [
-    // Invisible collection guides aligned to the five visual slots.
-    { id: 'guide-left', x: 100, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-    { id: 'guide-1', x: 276, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-    { id: 'guide-2', x: 452, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-    { id: 'guide-3', x: 628, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-    { id: 'guide-4', x: 804, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-    { id: 'guide-right', x: 964, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
-  ],
+  guideWalls: Array.from({ length: 13 }, (_, index) => ({
+    id: `channel-guide-${index}`,
+    x: CHANNEL_LEFT + index * CHANNEL_WIDTH - 5,
+    y: 1408,
+    width: 10,
+    height: 260,
+    friction: 0.08,
+    restitution: 0.18,
+  })),
 
-  slots: [
-    { id: 'slot-2', x: 116, y: 1460, width: 144, height: 194, score: 2 },
-    { id: 'slot-4', x: 292, y: 1460, width: 144, height: 194, score: 4 },
-    { id: 'slot-6', x: 468, y: 1460, width: 144, height: 194, score: 6 },
-    { id: 'slot-8', x: 644, y: 1460, width: 144, height: 194, score: 8 },
-    { id: 'slot-10', x: 820, y: 1460, width: 144, height: 194, score: 10 },
-  ],
+  channels: Array.from({ length: 12 }, (_, index) => ({
+    id: `channel-${index + 1}`,
+    channel: index + 1,
+    x: CHANNEL_LEFT + index * CHANNEL_WIDTH + 3,
+    y: CHANNEL_TOP,
+    width: CHANNEL_WIDTH - 6,
+    height: CHANNEL_HEIGHT,
+  })),
 
   stuckRecovery: {
     minSpeed: 0.12,
