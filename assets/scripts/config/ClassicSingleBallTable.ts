@@ -31,17 +31,18 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
     restitution: 0.72,
     linearDamping: 0.06,
     angularDamping: 0.04,
-    maxSpeed: 1450,
+    // RigidBody2D velocity unit (m/s).
+    maxSpeed: 18,
   },
 
-  // Expressed in design-units / s^2. Runtime scales this to physics units.
-  gravity: { x: 0, y: 1900 },
+  // Box2D-style physical acceleration in m/s^2; +Y means downward in table space.
+  gravity: { x: 0, y: 14 },
   fixedTimeStep: 1 / 60,
 
   // The reference machine behaves primarily as a gravity drop.
   release: {
-    initialVelocity: { x: 0, y: 40 },
-    horizontalJitter: 12,
+    initialVelocity: { x: 0, y: 0.4 },
+    horizontalJitter: 0.12,
   },
 
   bounds: {
@@ -91,8 +92,8 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
   ],
 
   stuckRecovery: {
-    minSpeed: 12,
+    minSpeed: 0.12,
     seconds: 2.25,
-    impulse: { x: 8, y: 45 },
+    impulse: { x: 0.02, y: 0.08 },
   },
 };
