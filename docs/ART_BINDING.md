@@ -1,37 +1,44 @@
 # Art Binding
 
-The gameplay branch is based on PR #1 (`feat/mvp-art-assets`).
+The gameplay branch inherits the visual style assets from PR #1, but the newly confirmed rules change the required bottom-board geometry.
 
-## 2D
+## Confirmed correction
 
-Place the final visual layer above the physics layer.
+The old preview interpreted 2 / 4 / 6 / 8 / 10 as five terminal slots. That is no longer the gameplay model.
 
-| Game object | Source asset |
+Correct structure:
+- 2 / 4 / 6 / 8 / 10 = multiplier-light states;
+- bottom physical result area = 12 terminal channels;
+- one physical ball per round.
+
+Therefore the existing five-slot SVGs are style references/placeholders only. Final scene art must provide a 12-channel bottom region and a separate multiplier-light display.
+
+## Reusable PR #1 assets
+
+| Object | Source |
 | --- | --- |
-| Table background | `art/mvp/2d/playfield/background.svg` |
-| Peg | `art/mvp/2d/playfield/peg.svg` |
-| Slot normal | `art/mvp/2d/playfield/slot.svg` |
-| Slot active | `art/mvp/2d/playfield/slot_active.svg` |
+| Background style | `art/mvp/2d/playfield/background.svg` |
+| Peg style | `art/mvp/2d/playfield/peg.svg` |
 | Ball | `art/mvp/2d/objects/ball.svg` |
-| HUD | `art/mvp/2d/ui/hud_panel.svg` |
-| START | `art/mvp/2d/ui/button_start.svg` |
-| START pressed | `art/mvp/2d/ui/button_start_pressed.svg` |
-| Collision flash | `art/mvp/2d/vfx/hit_flash.svg` |
+| HUD style | `art/mvp/2d/ui/hud_panel.svg` |
+| START button | `art/mvp/2d/ui/button_start*.svg` |
+| Hit VFX | `art/mvp/2d/vfx/hit_flash.svg` |
+| 3D cabinet | `art/mvp/3d/machine/pinball_machine.obj` |
 
-Keep visual transforms driven by the same 1080×1920 coordinates as `ClassicSingleBallTable.ts`.
+## Assets that need revision
 
-## 3D
+- replace five terminal slot visuals with 12 channels;
+- add active/inactive state for every channel;
+- add separate 2X / 4X / 6X / 8X / 10X multiplier lights;
+- add BET / current wager display if it exists on the source machine;
+- keep exact locations based on the original reference image.
 
-Import:
-- `art/mvp/3d/machine/pinball_machine.obj`
-- `art/mvp/3d/machine/pinball_machine.mtl`
+## Binding rule
 
-Attach the imported cabinet root to `OpeningMachineController.cabinet`.
+Visual transforms and collider geometry must share the same 1080×1920 coordinate spec from `ClassicSingleBallTable.ts`.
 
-## Why physics and sprites are separate
-
-Collision geometry must stay deterministic and easy to tune. Decorative artwork should not determine collider shape automatically. This prevents an art revision from silently changing the game's probability distribution.
+Physics colliders remain separate from decorative sprites so visual revisions cannot silently alter the probability distribution.
 
 ## Current limitation
 
-The repository contains the derived art/reference layout, not the original uploaded photograph/screenshot itself. Therefore the current coordinates reproduce the derived preview. Pixel-level matching to the original image requires re-measuring that original image when it is available again.
+The original uploaded physical-machine image is not stored in the repository. Exact 12-channel dimensions and several light positions therefore remain provisional until that image is re-measured.
