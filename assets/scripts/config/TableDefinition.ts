@@ -23,6 +23,16 @@ export type RectSensorDef = Readonly<{
   score: number;
 }>;
 
+export type RectWallDef = Readonly<{
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  friction: number;
+  restitution: number;
+}>;
+
 export type CircleObstacleDef = Readonly<{
   id: string;
   center: Vec2Def;
@@ -64,6 +74,7 @@ export type TableDefinition = Readonly<{
 
   pegs: readonly PegDef[];
   centerObstacles: readonly CircleObstacleDef[];
+  guideWalls: readonly RectWallDef[];
   slots: readonly RectSensorDef[];
 
   stuckRecovery: Readonly<{
