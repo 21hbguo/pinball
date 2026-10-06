@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "direction": "reference-grounded warm yellow arcade",
+  "palette": {
+    "yellow": "#F6B500",
+    "cream": "#FFF0C8",
+    "led_red": "#E60012",
+    "lcd_blue": "#005BFF",
+    "chrome": "#C8CDD2"
+  },
+  "package": "package/pinball_mvp_art_pack_v2.zip",
+  "runtime_assets": [
+    "2d/board/board_concept.jpg",
+    "2d/objects/ball.png",
+    "2d/playfield/peg.png",
+    "2d/playfield/bumper.png",
+    "2d/playfield/slot_6.png",
+    "2d/playfield/slot_10_active.png",
+    "2d/ui/start_button.png",
+    "2d/ui/info_panel.png",
+    "2d/vfx/hit_flash.png"
+  ],
+  "concept_assets": [
+    "3d/concept/machine_concept.jpg",
+    "preview/overview.jpg"
+  ]
+}
