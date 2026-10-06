@@ -17,7 +17,7 @@ import {
 import { CLASSIC_SINGLE_BALL_TABLE } from '../config/ClassicSingleBallTable';
 import type { RectWallDef } from '../config/TableDefinition';
 import { DesignSpace } from '../core/DesignSpace';
-import { GameSession, type SessionSnapshot } from '../core/GameSession';
+import { GameSession, type RoundSetup, type SessionSnapshot } from '../core/GameSession';
 import { BallLifecycle } from './BallLifecycle';
 
 const { ccclass } = _decorator;
@@ -33,6 +33,9 @@ export class ReferenceTableRuntime extends Component {
   private activeBody: RigidBody2D | null = null;
   private lastSnapshot: SessionSnapshot = this.session.getSnapshot();
 
+  @property
+  initialBallCredits = 100;
+
   onLoad(): void {
     this.configurePhysics();
     this.buildPhysicalTable();
@@ -42,23 +45,30 @@ export class ReferenceTableRuntime extends Component {
       this.node.emit('pinball-session-event', event);
     });
 
-    this.lastSnapshot = this.session.startSession();
+    this.lastSnapshot = this.session.startSession(this.initialBallCredits);
   }
 
-  /** Called by the START button. */
-  public startNextBall(): void {
-    if (!this.session.canStartBall() || this.activeBall) {
+  /** Lock one randomized round: multiplier + active channels + wager. */
+  public configureRound(setup: RoundSetup): void {
+    if (this.activeBall) {
+      return;
+    }
+    this.lastSnapshot = this.session.configureRound(setup);
+  }
+
+  /** Launch exactly one physical ball for the already-locked round. */
+  public launchCurrentRound(): void {
+    if (!this.session.canLaunch() || this.activeBall) {
       return;
     }
 
-    this.lastSnapshot = this.session.startBall();
+    this.lastSnapshot = this.session.launchSingleBall();
     this.spawnBall();
   }
 
-  /** Called by a RESTART action after game-over. */
-  public restartSession(): void {
+  public resetSession(initialBallCredits = this.initialBallCredits): void {
     this.destroyActiveBall();
-    this.lastSnapshot = this.session.startSession();
+    this.lastSnapshot = this.session.startSession(initialBallCredits);
   }
 
   public getSnapshot(): SessionSnapshot {
@@ -162,14 +172,14 @@ export class ReferenceTableRuntime extends Component {
       this.table.bounds.drainY - this.table.bounds.top,
     );
 
-    for (const slot of this.table.slots) {
-      const center = this.design.rectCenter(slot.x, slot.y, slot.width, slot.height);
-      const node = this.makeNode(slot.id, center.x, center.y);
+    for (const channel of this.table.channels) {
+      const center = this.design.rectCenter(channel.x, channel.y, channel.width, channel.height);
+      const node = this.makeNode(channel.id, center.x, center.y);
       const body = node.addComponent(RigidBody2D);
       body.type = ERigidBody2DType.Static;
 
       const sensor = node.addComponent(BoxCollider2D);
-      sensor.size = new Size(slot.width - 12, slot.height - 12);
+      sensor.size = new Size(channel.width - 12, channel.height - 12);
       sensor.sensor = true;
       sensor.apply();
 
@@ -177,7 +187,7 @@ export class ReferenceTableRuntime extends Component {
         Contact2DType.BEGIN_CONTACT,
         (_self, other) => {
           if (this.activeBall && other.node === this.activeBall) {
-            this.resolveSlot(slot.id);
+            this.resolveChannel(channel.channel);
           }
         },
         this,
@@ -249,11 +259,11 @@ export class ReferenceTableRuntime extends Component {
     this.activeBody = body;
   }
 
-  private resolveSlot(slotId: string): void {
+  private resolveChannel(channel: number): void {
     if (!this.activeBall) {
       return;
     }
-    this.lastSnapshot = this.session.resolveSlot(slotId);
+    this.lastSnapshot = this.session.resolveChannel(channel);
     this.destroyActiveBall();
   }
 
@@ -261,7 +271,7 @@ export class ReferenceTableRuntime extends Component {
     if (!this.activeBall) {
       return;
     }
-    this.lastSnapshot = this.session.resolveDrain();
+    this.lastSnapshot = this.session.resolveMiss();
     this.destroyActiveBall();
   }
 
