@@ -20,7 +20,7 @@ import { DesignSpace } from '../core/DesignSpace';
 import { GameSession, type RoundSetup, type SessionSnapshot } from '../core/GameSession';
 import { BallLifecycle } from './BallLifecycle';
 
-const { ccclass } = _decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass('ReferenceTableRuntime')
 export class ReferenceTableRuntime extends Component {
