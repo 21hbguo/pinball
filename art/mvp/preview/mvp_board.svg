@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0E1A2A"/><stop offset="1" stop-color="#09131E"/></linearGradient>
+  <linearGradient id="panel" x1="0" x2="1"><stop stop-color="#153858"/><stop offset="1" stop-color="#10243A"/></linearGradient>
+  <radialGradient id="ball" cx="30%" cy="25%"><stop stop-color="#fff"/><stop offset=".65" stop-color="#C8DBE5"/><stop offset="1" stop-color="#718693"/></radialGradient>
+</defs>
+<rect width="1080" height="1920" fill="url(#bg)"/>
+<rect x="54" y="54" width="972" height="1812" rx="56" fill="none" stroke="#EAF7FF" stroke-width="18"/>
+<rect x="84" y="84" width="912" height="1752" rx="44" fill="none" stroke="#53C6FF" stroke-width="6" opacity=".75"/>
+<rect x="160" y="120" width="760" height="154" rx="36" fill="url(#panel)" stroke="#9BE2FF" stroke-width="6"/>
+<line x1="540" y1="142" x2="540" y2="252" stroke="#9BE2FF" stroke-width="3" opacity=".3"/>
+<text x="350" y="175" text-anchor="middle" font-family="Arial" font-size="24" fill="#B9E8FF">BALLS</text>
+<text x="350" y="231" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" fill="#fff">005</text>
+<text x="730" y="175" text-anchor="middle" font-family="Arial" font-size="24" fill="#B9E8FF">SCORE</text>
+<text x="730" y="231" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" fill="#FFD56A">00050</text>
+<g fill="#4CB9E8" stroke="#EAF8FF" stroke-width="4">
+  <circle cx="300" cy="430" r="22"/><circle cx="540" cy="430" r="22"/><circle cx="780" cy="430" r="22"/>
+  <circle cx="220" cy="570" r="22"/><circle cx="420" cy="570" r="22"/><circle cx="660" cy="570" r="22"/><circle cx="860" cy="570" r="22"/>
+  <circle cx="300" cy="710" r="22"/><circle cx="540" cy="710" r="22"/><circle cx="780" cy="710" r="22"/>
+  <circle cx="220" cy="850" r="22"/><circle cx="420" cy="850" r="22"/><circle cx="660" cy="850" r="22"/><circle cx="860" cy="850" r="22"/>
+  <circle cx="300" cy="990" r="22"/><circle cx="540" cy="990" r="22"/><circle cx="780" cy="990" r="22"/>
+</g>
+<circle cx="520" cy="350" r="30" fill="url(#ball)" stroke="#fff" stroke-width="4"/>
+<g transform="translate(302 605)">
+  <path d="M238 0 280 92 380 104 304 174 326 274 238 222 150 274 172 174 96 104 196 92Z" fill="#FFB34A" opacity=".9"/>
+  <circle cx="238" cy="140" r="88" fill="#173858" stroke="#FFF4D6" stroke-width="12"/>
+  <text x="238" y="155" text-anchor="middle" font-family="Arial" font-size="46" font-weight="700" fill="#FFF4D6">PIN</text>
+</g>
+<g font-family="Arial" font-size="38" font-weight="700" text-anchor="middle" fill="#FFD56A">
+  <text x="188" y="1430">2</text><text x="364" y="1430">4</text><text x="540" y="1430">6</text><text x="716" y="1430">8</text><text x="892" y="1430">10</text>
+</g>
+<g fill="#102237" stroke="#B9E8FF" stroke-width="6">
+  <rect x="116" y="1460" width="144" height="194" rx="38"/><rect x="292" y="1460" width="144" height="194" rx="38"/>
+  <rect x="468" y="1460" width="144" height="194" rx="38"/><rect x="644" y="1460" width="144" height="194" rx="38"/>
+  <rect x="820" y="1460" width="144" height="194" rx="38"/>
+</g>
+<rect x="330" y="1708" width="420" height="118" rx="59" fill="#F79336" stroke="#FFF2C6" stroke-width="7"/>
+<text x="540" y="1783" text-anchor="middle" font-family="Arial" font-size="44" font-weight="700" fill="#132438">START</text>
+</svg>

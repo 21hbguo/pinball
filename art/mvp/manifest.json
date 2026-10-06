@@ -1,0 +1,65 @@
+{
+  "pack": "pinball-mvp-art",
+  "version": 1,
+  "style": "retro-arcade",
+  "palette": {
+    "navy": "#0F1B2D",
+    "blue": "#53C6FF",
+    "orange": "#F79336",
+    "cream": "#FFF4D6"
+  },
+  "assets": [
+    {
+      "path": "3d/machine/pinball_machine.obj",
+      "role": "opening rotating 3D machine"
+    },
+    {
+      "path": "3d/machine/pinball_machine.mtl",
+      "role": "3D materials"
+    },
+    {
+      "path": "2d/playfield/background.svg",
+      "role": "main playfield background"
+    },
+    {
+      "path": "2d/playfield/peg.svg",
+      "role": "repeatable collision peg"
+    },
+    {
+      "path": "2d/playfield/bumper.svg",
+      "role": "guide bumper"
+    },
+    {
+      "path": "2d/playfield/slot.svg",
+      "role": "normal scoring slot"
+    },
+    {
+      "path": "2d/playfield/slot_active.svg",
+      "role": "hit scoring slot"
+    },
+    {
+      "path": "2d/objects/ball.svg",
+      "role": "main pinball"
+    },
+    {
+      "path": "2d/ui/button_start.svg",
+      "role": "start button"
+    },
+    {
+      "path": "2d/ui/button_start_pressed.svg",
+      "role": "pressed start state"
+    },
+    {
+      "path": "2d/ui/hud_panel.svg",
+      "role": "balls and score HUD"
+    },
+    {
+      "path": "2d/vfx/hit_flash.svg",
+      "role": "collision hit flash"
+    },
+    {
+      "path": "preview/mvp_board.svg",
+      "role": "MVP composition preview"
+    }
+  ]
+}
