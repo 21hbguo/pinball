@@ -1,117 +1,86 @@
-# Pinball — Game Design v0.1
+# Pinball — Game Design v0.2
 
-## Direction
+## Core rule
 
-The first table is a portrait, one-active-ball-at-a-time physical marble machine inspired by the supplied reference images. It is not a flipper-driven American pinball table.
+Every round launches exactly **one physical ball**.
 
-The repository art pack is the current implementation reference. The exact source image is not embedded in the repository, so values that cannot be verified from the image are isolated in configuration and must not be hard-coded into gameplay logic.
+When the player chooses to "put in" multiple balls, those balls are **wager credits**. They do not become multiple physical balls on the playfield.
 
-## Player loop
+Example:
+- wallet: 899 ball-credits
+- wager: 5
+- locked base multiplier: 4X
+- physical balls launched: 1
+- if the one ball lands in an active channel: payout = 5 × 4 = 20 ball-credits
+- if it lands in an inactive channel: payout = 0
 
-1. Enter the 3D cabinet view.
-2. Tap the cabinet to move into the 2D playfield.
-3. Press START to release one ball.
-4. The player watches the ball fall through the peg field.
-5. The ball enters one of five scoring slots.
-6. Add the slot value to the total score.
-7. Repeat until the configured ball count is exhausted.
-8. Show final score and allow replay.
+## Round flow
 
-Only one ball is active at a time.
+1. Player has a ball-credit balance.
+2. First START press begins the multiplier/channel light shuffle.
+3. Second START press locks:
+   - one base multiplier from 2X / 4X / 6X / 8X / 10X;
+   - a set of active channels among the 12 terminal channels.
+4. Player chooses wager N.
+5. The game deducts N ball-credits.
+6. Exactly one physical ball is released.
+7. The ball travels through the peg field.
+8. It ends in one of 12 terminal channels, or a special/bonus destination if the machine supports one.
+9. If the terminal channel is active:
+   payout = base multiplier × wager.
+10. Otherwise payout = 0.
+11. Add payout to wallet.
+12. Return to START randomization for the next round.
 
-## Reference-layout baseline
+## Risk / reward
 
-Design coordinate system: 1080 × 1920, origin at top-left.
+The machine couples higher multipliers with fewer active channels.
 
-Visible elements currently recovered from the art/reference work:
-- HUD near the top with BALLS and SCORE.
-- Ball release position around (520, 350).
-- 17 circular pegs in five staggered rows.
-- Central large visual/obstacle around (540, 745).
-- Five terminal scoring slots with visible values 2 / 4 / 6 / 8 / 10.
-- START button near the bottom.
+Source-confirmed examples from the supplied rule description:
+- 2X: roughly 4-5 of 12 channels may be active.
+- 10X: roughly 1 of 12 channels may be active.
 
-### Peg centers
+The exact 4X / 6X / 8X active-channel counts and exact random-selection probabilities are not yet verified. They must stay configurable rather than guessed in production logic.
 
-Row 1: (300,430), (540,430), (780,430)
+## Important distinction
 
-Row 2: (220,570), (420,570), (660,570), (860,570)
+The values 2 / 4 / 6 / 8 / 10 are **multiplier states**, not five terminal scoring slots.
 
-Row 3: (300,710), (540,710), (780,710)
+The physical terminal result is one of **12 channels**.
 
-Row 4: (220,850), (420,850), (660,850), (860,850)
+## Physical model
 
-Row 5: (300,990), (540,990), (780,990)
-
-### Slot centers / values
-
-- x=188 → 2
-- x=364 → 4
-- x=540 → 6
-- x=716 → 8
-- x=892 → 10
-
-Slot top is approximately y=1460, width 144, height 194 in the current art preview.
-
-## Scoring
-
-For the reference-faithful rule set:
-- Peg collisions do not directly add score.
-- The primary score is the terminal slot value.
-- The running total persists across all balls in the session.
-- A ball that leaves the playfield without entering a scoring slot scores 0.
-
-No combo, multiplier, bonus-ball, flipper, or nudge mechanic is enabled in the reference-faithful preset unless later source-image evidence supports it.
-
-## Physics goals
-
-The game should feel physical rather than scripted:
+Only one dynamic ball exists per round:
 - fixed physics timestep;
 - circular dynamic ball;
-- circular static pegs;
+- static peg field;
 - low friction;
-- moderately elastic ball/peg contacts;
-- terminal slot sensors;
-- anti-stuck recovery only after the ball has remained nearly stationary for a configurable time.
+- moderate restitution;
+- terminal channel sensors;
+- anti-stuck recovery only if required.
 
-Randomness should come primarily from physical collisions. Any launch jitter must remain very small and configurable.
+Wager size must never alter ball mass, radius, physics, or number of balls. It affects settlement only.
 
-## Interaction
+## UI data
 
-START has three states:
-- READY: enabled and starts the next ball;
-- BALL_ACTIVE: disabled;
-- GAME_OVER: becomes RESTART.
+Recommended live fields:
+- BALLS / wallet balance
+- BET / wager
+- current base multiplier
+- effective multiplier = base multiplier × wager
+- active-channel lights
+- current/last terminal channel
+- actual payout
+- card count, only if a non-cash game feature is later implemented
 
-During a ball, the default reference-faithful preset has no steering input.
+## Source fidelity
 
-## Presentation
+Layout geometry should be measured from the original machine image:
+- peg count and centers;
+- ball size;
+- 12 channel positions and widths;
+- multiplier-light positions;
+- central bonus structure;
+- labels and display locations.
 
-3D opening:
-- low-poly cabinet slowly rotates;
-- player taps cabinet;
-- camera pushes toward the playfield glass;
-- crossfade/match-cut into the 2D playfield.
-
-2D play:
-- keep the cabinet proportions and number placement close to the source;
-- HUD updates immediately;
-- slot lights briefly on score;
-- collision VFX remain subtle and must not obscure the physical path.
-
-## Data-driven requirement
-
-All of the following live in table configuration:
-- board size;
-- balls per run;
-- ball spawn;
-- ball radius/material;
-- gravity;
-- peg positions/radius/material;
-- obstacle geometry;
-- slot positions/sizes/values;
-- launch parameters;
-- stuck-ball thresholds;
-- scoring rules.
-
-This lets us refine the table to pixel-level source-image fidelity later without rewriting game systems.
+Current geometry in code is provisional where the source image is unavailable.
