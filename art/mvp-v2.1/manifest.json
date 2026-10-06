@@ -1,0 +1,25 @@
+{
+  "version": "2.1",
+  "confirmed_layout": {
+    "multiplier_values": [
+      2,
+      4,
+      6,
+      8,
+      10
+    ],
+    "multiplier_location": "upper control panel",
+    "terminal_channels": 12,
+    "terminal_channel_location": "bottom of playfield",
+    "physical_balls_per_round": 1
+  },
+  "palette": {
+    "yellow": "#F6B500",
+    "cream": "#FFF0C8",
+    "led_red": "#E60012",
+    "active_green": "#46FF7D",
+    "lcd_blue": "#005BFF",
+    "chrome": "#C8CDD2"
+  },
+  "package": "package/pinball_mvp_art_pack_v2_1.zip"
+}
