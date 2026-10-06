@@ -72,6 +72,16 @@ export const CLASSIC_SINGLE_BALL_TABLE: TableDefinition = {
     },
   ],
 
+  guideWalls: [
+    // Invisible collection guides aligned to the five visual slots.
+    { id: 'guide-left', x: 100, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+    { id: 'guide-1', x: 276, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+    { id: 'guide-2', x: 452, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+    { id: 'guide-3', x: 628, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+    { id: 'guide-4', x: 804, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+    { id: 'guide-right', x: 964, y: 1408, width: 16, height: 260, friction: 0.08, restitution: 0.18 },
+  ],
+
   slots: [
     { id: 'slot-2', x: 116, y: 1460, width: 144, height: 194, score: 2 },
     { id: 'slot-4', x: 292, y: 1460, width: 144, height: 194, score: 4 },
